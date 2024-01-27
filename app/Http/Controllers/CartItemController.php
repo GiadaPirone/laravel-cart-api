@@ -24,5 +24,19 @@ class CartItemController extends Controller
         ], 201);
     }
 
+    public function addToCart($cartId, $itemId)
+    {
+        $cart = Cart::findOrFail($cartId);
+        $item = Item::findOrFail($itemId);
+
+        $cart->items()->attach($item);
+
+        $updatedCart = Cart::with('items')->findOrFail($cart->id);
+
+        return response()->json([
+            'data' => $updatedCart,
+        ], 200);
+    }
+
    
 }
