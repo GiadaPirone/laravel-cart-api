@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\Item;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CartItemController extends Controller
 {
+    
     public function createCart(Request $request)
     {
 
@@ -16,6 +18,10 @@ class CartItemController extends Controller
 
         $cart->items()->attach($item);
         $updatedCart = Cart::with('items')->findOrFail($cart->id);
+
+        // Registra un messaggio nel file di log
+        Log::channel('cart_log')->info('Carrello creato: ' . json_encode($cart));
+
 
         return response()->json([
 

@@ -126,6 +126,14 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+
+        'cart_log' => [
+            'driver' => 'daily', // Puoi scegliere un altro driver se preferisci
+            'path' => storage_path('logs/cart.log'),
+            'level' => 'info', // Puoi impostare il livello appropriato (debug, info, warning, error, etc.)
+        ],
     ],
+
+
 
 ];
