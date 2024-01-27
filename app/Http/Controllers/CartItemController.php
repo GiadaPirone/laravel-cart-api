@@ -38,5 +38,15 @@ class CartItemController extends Controller
         ], 200);
     }
 
+    public function deleteFromCart($cartId, $itemId)
+    {
+        $cart = Cart::findOrFail($cartId);
+
+        $cart->items()->updateExistingPivot($itemId, ['deleted_at' => now()]);
+
+        return response()->json([], 204);
+
+    }
+
    
 }
