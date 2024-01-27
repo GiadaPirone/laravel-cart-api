@@ -132,6 +132,12 @@ return [
             'path' => storage_path('logs/cart.log'),
             'level' => 'info', // Puoi impostare il livello appropriato (debug, info, warning, error, etc.)
         ],
+
+        'cart_modification_log' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/cart_modification.log'),
+            'level' => 'info',
+        ],
     ],
 
 
