@@ -47,6 +47,15 @@ class CartItemController extends Controller
         return response()->json([], 204);
 
     }
+    
+    public function getAllCarts()
+    {
+        $carts = Cart::with('items')->get();
+
+        return response()->json([
+            'data' => $carts,
+        ], 200);
+    }
 
    
 }
