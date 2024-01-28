@@ -28,7 +28,6 @@ class CartItemController extends Controller
             return response()->json([
                 'data' => $updatedCart,
             ], 201);
-
         } catch (ModelNotFoundException $e) {
             return response()->json(['error' => 'Cart non creato: item inserito non esiste.'], 404);
         }
@@ -36,19 +35,34 @@ class CartItemController extends Controller
 
     public function addToCart($cartId, $itemId)
     {
-        $cart = Cart::findOrFail($cartId);
-        $item = Item::findOrFail($itemId);
+        try {
 
-        $cart->items()->attach($item);
+            // cerca cart/item nel db 
+            $cart = Cart::findOrFail($cartId);
+            $item = Item::findOrFail($itemId);
 
-        $updatedCart = Cart::with('items')->findOrFail($cart->id);
+            // collega item al cart
+            $cart->items()->attach($item);
 
-        // Registra un messaggio nel file di log dedicato alle modifiche del carrello
-        Log::channel('cart_modification_log')->info('Prodotto con ID ' . $itemId . ' aggiunto al carrello:' . $cartId . json_encode($updatedCart));
+            $updatedCart = Cart::with('items')->findOrFail($cart->id);
 
-        return response()->json([
-            'data' => $updatedCart,
-        ], 200);
+            // Registra un messaggio nel file di log dedicato alle modifiche del carrello
+            Log::channel('cart_modification_log')->info('Prodotto con ID ' . $itemId . ' aggiunto al carrello:' . $cartId . json_encode($updatedCart));
+
+            return response()->json([
+                'data' => $updatedCart,
+            ], 200);
+
+
+        } catch (ModelNotFoundException $exception) {
+            // Verifica il tipo di eccezione
+            if ($exception->getModel() === Cart::class) {
+                return response()->json(['error' => 'Carrello non trovato.'], 404);
+                
+            } elseif ($exception->getModel() === Item::class) {
+                return response()->json(['error' => 'Elemento non trovato.'], 404);
+            }
+        }
     }
 
     public function deleteFromCart($cartId, $itemId)
