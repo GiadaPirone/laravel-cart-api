@@ -29,7 +29,7 @@ class CartItemController extends Controller
                 'data' => $updatedCart,
             ], 201);
         } catch (ModelNotFoundException $e) {
-            return response()->json(['error' => 'Cart non creato: item inserito non esiste.'], 404);
+            return response()->json(['error' => 'Carrello non creato: il prodotto inserito non esiste.'], 404);
         }
     }
 
@@ -52,30 +52,45 @@ class CartItemController extends Controller
             return response()->json([
                 'data' => $updatedCart,
             ], 200);
-
-
         } catch (ModelNotFoundException $exception) {
-            // Verifica il tipo di eccezione
+
             if ($exception->getModel() === Cart::class) {
                 return response()->json(['error' => 'Carrello non trovato.'], 404);
-                
             } elseif ($exception->getModel() === Item::class) {
-                return response()->json(['error' => 'Elemento non trovato.'], 404);
+                return response()->json(['error' => 'Prodotto non trovato.'], 404);
             }
         }
     }
 
+
     public function deleteFromCart($cartId, $itemId)
     {
-        $cart = Cart::findOrFail($cartId);
-
-        $cart->items()->updateExistingPivot($itemId, ['deleted_at' => now()]);
-
-        // Registra un messaggio nel file di log dedicato alle modifiche del carrello
-        Log::channel('cart_modification_log')->info('Prodotto con ID ' . $itemId . ' rimosso dal carrello:' . $cartId . json_encode($cart));
-
-        return response()->json([], 204);
+        try {
+            $cart = Cart::findOrFail($cartId);
+    
+            // Verifica se l'elemento esiste prima di tentare l'eliminazione
+            $existingItem = $cart->items()->find($itemId);
+    
+            if ($existingItem) {
+                // Elimina l'elemento solo se esiste nel carrello
+                $cart->items()->detach($itemId);
+    
+                // Registra un messaggio nel file di log dedicato alle modifiche del carrello
+                Log::channel('cart_modification_log')->info('Prodotto con ID ' . $itemId . ' rimosso dal carrello:' . $cartId . json_encode($cart));
+    
+                return response()->json([], 204);
+            } else {
+                return response()->json(['error' => 'Prodotto non trovato nel carrello.'], 404);
+            }
+    
+        } catch (ModelNotFoundException $cartException) {
+            return response()->json(['error' => 'Stai provando ad eliminare un prodotto in un carrello non esistente.'], 404);
+    
+        } catch (ModelNotFoundException $itemException) {
+            return response()->json(['error' => 'Prodotto non trovato.'], 404);
+        }
     }
+
 
     public function getAllCarts()
     {
