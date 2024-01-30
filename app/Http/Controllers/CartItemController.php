@@ -72,8 +72,8 @@ class CartItemController extends Controller
             $existingItem = $cart->items()->find($itemId);
     
             if ($existingItem) {
-                // Elimina l'elemento solo se esiste nel carrello
-                $cart->items()->detach($itemId);
+                // Eliminazione logica dell'elemento
+                $cart->items()->updateExistingPivot($itemId, ['deleted_at' => now()]);
     
                 // Registra un messaggio nel file di log dedicato alle modifiche del carrello
                 Log::channel('cart_modification_log')->info('Prodotto con ID ' . $itemId . ' rimosso dal carrello:' . $cartId . json_encode($cart));
