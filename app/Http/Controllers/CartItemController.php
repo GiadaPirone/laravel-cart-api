@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class CartItemController extends Controller
-{
+{    
     public function createCart(Request $request)
     {
         try {

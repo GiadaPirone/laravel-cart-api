@@ -9,6 +9,7 @@ class Item extends Model
 {
     use HasFactory;
 
+    // colonne del db che posso essere riempite massivamente
     protected $fillable =[
         "name",
         "sku",
